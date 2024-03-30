@@ -17,9 +17,6 @@
 
 package org.apache.kyuubi.plugin.spark.authz.ranger
 
-import java.io.File
-import java.util
-
 import scala.language.implicitConversions
 
 import org.apache.ranger.plugin.policyengine.RangerAccessResourceImpl
