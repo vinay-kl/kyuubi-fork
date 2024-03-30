@@ -29,10 +29,10 @@ object AccessType extends Enumeration {
     Value
 
   def apply(obj: PrivilegeObject, opType: OperationType, isInput: Boolean): AccessType = {
-    if (obj.privilegeObjectType == DFS_URI || obj.privilegeObjectType == LOCAL_URI) {
-      // This is equivalent to ObjectType.URI
-      return if (isInput) READ else WRITE
-    }
+//    if (obj.privilegeObjectType == DFS_URI || obj.privilegeObjectType == LOCAL_URI) {
+//      // This is equivalent to ObjectType.URI
+//      return if (isInput) READ else WRITE
+//    }
 
     obj.actionType match {
       case PrivilegeObjectActionType.OTHER => opType match {

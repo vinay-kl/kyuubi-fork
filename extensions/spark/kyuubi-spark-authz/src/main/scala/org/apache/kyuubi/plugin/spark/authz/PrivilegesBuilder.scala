@@ -84,14 +84,15 @@ object PrivilegesBuilder {
       case p if p.getTagValue(KYUUBI_AUTHZ_TAG).nonEmpty =>
 
       case scan if isKnownScan(scan) && scan.resolved =>
-        val tables = getScanSpec(scan).tables(scan, spark)
-        // If the the scan is table-based, we check privileges on the table we found
-        // otherwise, we check privileges on the uri we found
-        if (tables.nonEmpty) {
-          tables.foreach(mergeProjection(_, scan))
-        } else {
-          getScanSpec(scan).uris(scan).foreach(privilegeObjects += PrivilegeObject(_))
-        }
+        getScanSpec(scan).tables(scan, spark).foreach(mergeProjection(_, scan))
+//        val tables = getScanSpec(scan).tables(scan, spark)
+//        // If the the scan is table-based, we check privileges on the table we found
+//        // otherwise, we check privileges on the uri we found
+//        if (tables.nonEmpty) {
+//          tables.foreach(mergeProjection(_, scan))
+//        } else {
+//          getScanSpec(scan).uris(scan).foreach(privilegeObjects += PrivilegeObject(_))
+//        }
 
       case u if u.nodeName == "UnresolvedRelation" =>
         val parts = invokeAs[String](u, "tableName").split("\\.")
