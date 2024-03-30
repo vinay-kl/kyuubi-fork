@@ -144,6 +144,8 @@ object SparkRangerAdminPlugin extends RangerBasePlugin("spark", "sparkSql")
       requests: Seq[RangerAccessRequest],
       auditHandler: SparkRangerAuditHandler): Unit = {
     if (requests.nonEmpty) {
+      println("requests not empty::")
+      println("requests.asJava:::" + requests.asJava)
       val results = SparkRangerAdminPlugin.isAccessAllowed(requests.asJava, auditHandler)
       if (results != null) {
         val indices = results.asScala.zipWithIndex.filter { case (result, idx) =>

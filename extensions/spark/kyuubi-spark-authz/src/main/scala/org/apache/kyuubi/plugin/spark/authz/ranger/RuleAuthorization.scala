@@ -33,7 +33,12 @@ case class RuleAuthorization(spark: SparkSession) extends Authorization(spark) {
   override def checkPrivileges(spark: SparkSession, plan: LogicalPlan): Unit = {
     val auditHandler = new SparkRangerAuditHandler
     val ugi = getAuthzUgi(spark.sparkContext)
+    println("UGI:::"+ String.valueOf(ugi))
+    println("PLAN::"+ plan)
     val (inputs, outputs, opType) = PrivilegesBuilder.build(plan, spark)
+    println("inputs::"+ inputs)
+    println("outputs::"+ outputs)
+    println("opType::"+ opType)
     val requests = new ArrayBuffer[AccessRequest]()
 
     def addAccessRequest(objects: Iterable[PrivilegeObject], isInput: Boolean): Unit = {
@@ -50,11 +55,14 @@ case class RuleAuthorization(spark: SparkSession) extends Authorization(spark) {
     addAccessRequest(inputs, isInput = true)
     addAccessRequest(outputs, isInput = false)
 
+    println("requests::" + requests)
+
     val requestArrays = requests.map { request =>
       val resource = request.getResource.asInstanceOf[AccessResource]
       resource.objectType match {
         case ObjectType.COLUMN if resource.getColumns.nonEmpty =>
           resource.getColumns.map { col =>
+            println("col:::" + col)
             val cr =
               AccessResource(
                 COLUMN,
@@ -63,11 +71,16 @@ case class RuleAuthorization(spark: SparkSession) extends Authorization(spark) {
                 col,
                 Option(resource.getOwnerUser),
                 resource.catalog)
+            println("cr::" + cr)
+            cr.setValue("schema", resource.getDatabase)
+            println("cr::" + cr)
             AccessRequest(cr, ugi, opType, request.accessType).asInstanceOf[RangerAccessRequest]
           }
         case _ => Seq(request)
       }
     }.toSeq
+
+    println("requestArrays::" + requestArrays.flatten)
 
     if (authorizeInSingleCall) {
       verify(requestArrays.flatten, auditHandler)

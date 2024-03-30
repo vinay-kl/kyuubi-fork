@@ -31,7 +31,7 @@ import org.apache.kyuubi.plugin.spark.authz.OperationType.OperationType
 class AccessResource private (val objectType: ObjectType, val catalog: Option[String])
   extends RangerAccessResourceImpl {
   implicit def asString(obj: Object): String = if (obj != null) obj.asInstanceOf[String] else null
-  def getDatabase: String = getValue("database")
+  def getDatabase: String = getValue("schema")
   def getTable: String = getValue("table")
   def getColumn: String = getValue("column")
   def getColumns: Seq[String] = {
@@ -52,27 +52,31 @@ object AccessResource {
     val resource = new AccessResource(objectType, catalog)
 
     resource.objectType match {
-      case DATABASE => resource.setValue("database", firstLevelResource)
+      case DATABASE =>
+        resource.setValue("catalog", "delta_udp")
+        resource.setValue("schema", firstLevelResource)
       case FUNCTION =>
-        resource.setValue("database", Option(firstLevelResource).getOrElse(""))
+        resource.setValue("schema", Option(firstLevelResource).getOrElse(""))
         resource.setValue("udf", secondLevelResource)
       case COLUMN =>
-        resource.setValue("database", firstLevelResource)
+        resource.setValue("catalog", "delta_udp")
+        resource.setValue("schema", firstLevelResource)
         resource.setValue("table", secondLevelResource)
         resource.setValue("column", thirdLevelResource)
-      case TABLE | VIEW | INDEX =>
-        resource.setValue("database", firstLevelResource)
+      case TABLE | VIEW => // fixme spark have added index support
+        resource.setValue("catalog", "delta_udp")
+        resource.setValue("schema", firstLevelResource)
         resource.setValue("table", secondLevelResource)
-      case URI =>
-        val objectList = new util.ArrayList[String]
-        Option(firstLevelResource)
-          .filter(_.nonEmpty)
-          .foreach { path =>
-            val s = path.stripSuffix(File.separator)
-            objectList.add(s)
-            objectList.add(s + File.separator)
-          }
-        resource.setValue("url", objectList)
+//      case URI =>
+//        val objectList = new util.ArrayList[String]
+//        Option(firstLevelResource)
+//          .filter(_.nonEmpty)
+//          .foreach { path =>
+//            val s = path.stripSuffix(File.separator)
+//            objectList.add(s)
+//            objectList.add(s + File.separator)
+//          }
+//        resource.setValue("url", objectList)
     }
     resource.setServiceDef(SparkRangerAdminPlugin.getServiceDef)
     owner.foreach(resource.setOwnerUser)
