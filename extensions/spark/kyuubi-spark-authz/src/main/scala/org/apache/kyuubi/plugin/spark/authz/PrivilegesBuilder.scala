@@ -187,19 +187,19 @@ object PrivilegesBuilder {
               LOG.debug(databaseDesc.error(plan, e))
           }
         }
-        desc.uriDescs.foreach { ud =>
-          try {
-            val uris = ud.extract(plan, spark)
-            if (ud.isInput) {
-              inputObjs ++= uris.map(PrivilegeObject(_))
-            } else {
-              outputObjs ++= uris.map(PrivilegeObject(_))
-            }
-          } catch {
-            case e: Exception =>
-              LOG.debug(ud.error(plan, e))
-          }
-        }
+//        desc.uriDescs.foreach { ud =>
+//          try {
+//            val uris = ud.extract(plan, spark)
+//            if (ud.isInput) {
+//              inputObjs ++= uris.map(PrivilegeObject(_))
+//            } else {
+//              outputObjs ++= uris.map(PrivilegeObject(_))
+//            }
+//          } catch {
+//            case e: Exception =>
+//              LOG.debug(ud.error(plan, e))
+//          }
+//        }
         desc.operationType
 
       case classname if TABLE_COMMAND_SPECS.contains(classname) =>
@@ -211,19 +211,19 @@ object PrivilegesBuilder {
             outputObjs ++= getTablePriv(td)
           }
         }
-        spec.uriDescs.foreach { ud =>
-          try {
-            val uris = ud.extract(plan, spark)
-            if (ud.isInput) {
-              inputObjs ++= uris.map(PrivilegeObject(_))
-            } else {
-              outputObjs ++= uris.map(PrivilegeObject(_))
-            }
-          } catch {
-            case e: Exception =>
-              LOG.debug(ud.error(plan, e))
-          }
-        }
+//        spec.uriDescs.foreach { ud =>
+//          try {
+//            val uris = ud.extract(plan, spark)
+//            if (ud.isInput) {
+//              inputObjs ++= uris.map(PrivilegeObject(_))
+//            } else {
+//              outputObjs ++= uris.map(PrivilegeObject(_))
+//            }
+//          } catch {
+//            case e: Exception =>
+//              LOG.debug(ud.error(plan, e))
+//          }
+//        }
         spec.queries(plan).foreach { p =>
           if (p.resolved) {
             buildQuery(Project(p.output, p), inputObjs, spark = spark)
