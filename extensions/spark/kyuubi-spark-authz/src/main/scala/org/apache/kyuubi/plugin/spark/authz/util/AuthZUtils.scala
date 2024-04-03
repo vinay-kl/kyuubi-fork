@@ -52,7 +52,7 @@ private[authz] object AuthZUtils {
       verifyKyuubiSessionUser(spark, user)
     }
 
-    if (user != null && user != UserGroupInformation.getCurrentUser.getShortUserName) {
+    if (user != null && user != UserGroupInformation.getCurrentUser.getUserName) {
       UserGroupInformation.createRemoteUser(user)
     } else {
       UserGroupInformation.getCurrentUser

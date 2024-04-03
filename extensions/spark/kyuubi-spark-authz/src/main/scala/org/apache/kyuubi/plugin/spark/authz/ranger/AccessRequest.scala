@@ -37,7 +37,7 @@ object AccessRequest {
       user: UserGroupInformation,
       opType: OperationType,
       accessType: AccessType): AccessRequest = {
-    val userName = user.getShortUserName
+    val userName = user.getUserName
     val userGroups = getUserGroups(user)
     val req = new AccessRequest(accessType)
     req.setResource(resource)
@@ -78,7 +78,7 @@ object AccessRequest {
       val userStore = invokeAs[AnyRef](storeEnricher, "getRangerUserStore")
       val userGroupMapping =
         invokeAs[JHashMap[String, JSet[String]]](userStore, "getUserGroupMapping")
-      Some(userGroupMapping.get(user.getShortUserName))
+      Some(userGroupMapping.get(user.getUserName))
     } catch {
       case _: NoSuchMethodException =>
         None
